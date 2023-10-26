@@ -10,10 +10,13 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] private Transform paddle1Transform;
     [SerializeField] private Transform paddle2Transform;
-    [SerializeField] private Transform ballTransform;
+    [SerializeField] private GameObject ball;
+
+    [SerializeField] private GameObject startMessageObject;
 
     private int paddle1Score;
     private int paddle2Score;
+    private bool bIsPlaying;
 
     private static GameManager instance;
 
@@ -27,25 +30,42 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void paddle1Scored() {
-
-        paddle1Score++;
-        paddle1ScoreText.text = paddle1Score.ToString();
-        restart();
+    private void Start()
+    {
+        bIsPlaying = false;
+        startMessageObject.GetComponent<TextScript>().startBlink();
     }
 
-    public void paddle2Scored()
+    private void Update()
     {
+        if (!bIsPlaying && Input.GetButton("Submit"))
+        {
+            bIsPlaying = true;
+            ball.GetComponent<BallScript>().Launch();
+            startMessageObject.GetComponent<TextScript>().stopBlink();
+        }
+    }
 
-        paddle1Score++;
-        paddle1ScoreText.text = paddle1Score.ToString();
+    public void playerScored(string player) {
+
+        switch (player) {
+            case "1":
+                paddle1Score++;
+                paddle1ScoreText.text = paddle1Score.ToString();
+                break;
+            case "2":
+                paddle2Score++;
+                paddle2ScoreText.text = paddle2Score.ToString();
+                break;
+        }
+        
         restart();
     }
 
     public void restart() {
-        paddle1Transform.position = new Vector2(paddle1Transform.position.x, 0);
-        paddle2Transform.position = new Vector2(paddle2Transform.position.x, 0);
-        ballTransform.position = new Vector2(0,0);
+        ball.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
+        ball.transform.position = new Vector2(0,0);
+        startMessageObject.GetComponent<TextScript>().startBlink();
+        bIsPlaying = false;
     }
-
 }

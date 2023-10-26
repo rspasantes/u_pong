@@ -8,13 +8,14 @@ public class BallScript : MonoBehaviour
     [SerializeField] private float initialVelocity = 4f;
     [SerializeField] private float velocityMultiplier = 1.1f;
 
+    private bool isLaunched;
+
     void Start()
     {
         rb2d = GetComponent<Rigidbody2D>();
-        Launch();
     }
 
-    private void Launch() {
+    public void Launch() {
         float xVelocity = Random.Range(0, 2) == 0 ? 1 : -1;
         float yVelocity = Random.Range(0, 2) == 0 ? 1 : -1; 
         rb2d.velocity = new Vector2(xVelocity, yVelocity) * initialVelocity;
@@ -31,18 +32,14 @@ public class BallScript : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Goal1"))
         {
-            GameManager.Instance.paddle1Scored();
-            GameManager.Instance.restart();
-            Launch();
+            GameManager.Instance.playerScored("1");
         } else {
-            GameManager.Instance.paddle2Scored();
-            GameManager.Instance.restart();
-            Launch();
+            GameManager.Instance.playerScored("2");
         }
     }
 
     void Update()
     {
-        
+
     }
 }
