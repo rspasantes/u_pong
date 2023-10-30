@@ -12,18 +12,21 @@ public class TextScript : MonoBehaviour
     {
         textComponent = GetComponent<TMP_Text>();
     }
-
+    
+    // Start the text blinking
     public void startBlink() {
         blinkCoroutine = StartCoroutine(Blink());
         textComponent.enabled = true;
     }
 
+    // Stop the text blinking
     public void stopBlink()
     {
         StopCoroutine(blinkCoroutine);
         textComponent.enabled = false;
     }
 
+    // Makes the text blink according to the blinkTime variable
     IEnumerator Blink()
     {
         while (true)

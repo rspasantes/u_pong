@@ -2,17 +2,20 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BallScript : MonoBehaviour
+public class BallController : MonoBehaviour
 {
     private Rigidbody2D rb2d;
     [SerializeField] private float initialVelocity = 4f;
     [SerializeField] private float velocityMultiplier = 1.1f;
+
+    private AudioSource audioSource;
 
     private bool isLaunched;
 
     void Start()
     {
         rb2d = GetComponent<Rigidbody2D>();
+        audioSource = GetComponent<AudioSource>();
     }
 
     public void Launch() {
@@ -23,6 +26,7 @@ public class BallScript : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
+        audioSource.Play();
         if (collision.gameObject.CompareTag("Paddle")) {
             rb2d.velocity *= velocityMultiplier;
         }
@@ -30,6 +34,7 @@ public class BallScript : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
+
         if (collision.gameObject.CompareTag("Goal1"))
         {
             GameManager.Instance.playerScored("1");
