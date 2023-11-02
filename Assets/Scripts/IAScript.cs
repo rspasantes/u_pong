@@ -3,10 +3,12 @@ using UnityEngine;
 public class IAScript : MonoBehaviour
 {
     [SerializeField] private bool isPlayer1;
-    [SerializeField] private GameObject ball;      // Referencia a la pelota
-    public float speed = 7f;                      // Velocidad de la pala
-    public float maxYLimit = 3.5f;                // Límite superior/inferior que la pala no puede pasar
-    public float inaccuracy = 0.5f;                // Grado de inexactitud en la percepción de la posición de la pelota
+    [SerializeField] private GameObject ball;
+    [SerializeField] private float velocitySum = 0.6f;
+    public float speed;           
+    public float maxYLimit = 3.5f;          
+    public float inaccuracy = 0.5f;
+    
 
     private Transform transBall;
     private Rigidbody2D rb2DBall;
@@ -43,7 +45,8 @@ public class IAScript : MonoBehaviour
     }
 
     public void aumSpeed() {
-        speed += 0.2f;
+        speed += velocitySum;
+        Debug.Log("Aumentamos velocidad " + speed);
     }
 
     public void resetSpeed() {

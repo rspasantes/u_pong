@@ -19,6 +19,7 @@ public class BallController : MonoBehaviour
     }
 
     public void Launch() {
+        gameObject.SetActive(true);
         float xVelocity = Random.Range(0, 2) == 0 ? 1 : -1;
         float yVelocity = Random.Range(0, 2) == 0 ? 1 : -1; 
         rb2d.velocity = new Vector2(xVelocity, yVelocity) * initialVelocity;
@@ -35,11 +36,13 @@ public class BallController : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D collision)
     {
 
+        gameObject.SetActive(false);
+
         if (collision.gameObject.CompareTag("Goal1"))
         {
-            GameManager.Instance.playerScored("1");
-        } else {
             GameManager.Instance.playerScored("2");
+        } else {
+            GameManager.Instance.playerScored("1");
         }
     }
 

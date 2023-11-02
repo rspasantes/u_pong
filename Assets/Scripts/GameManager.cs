@@ -12,7 +12,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private TMP_Text txtPaddle2Score;
     [SerializeField] private TMP_Text txtIAStateTextP1;
     [SerializeField] private TMP_Text txtIAStateTextP2;
-    [SerializeField] private TMP_Text txtEndGame;
+    [SerializeField] private GameObject goEndGame;
 
     [SerializeField] private GameObject goStartMessage;
 
@@ -20,6 +20,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject goPaddle1;
     [SerializeField] private GameObject goPaddle2;
     [SerializeField] private GameObject goBall;
+    [SerializeField] private GameObject goHelpScreen;
 
     // Scripts
     private PaddleController pcPaddle1;
@@ -27,13 +28,16 @@ public class GameManager : MonoBehaviour
     private IAScript iaPaddle1;
     private IAScript iaPaddle2;
 
-
-    private int paddle1Score;
-    private int paddle2Score;
+    [SerializeField] private int paddle1Score;
+    [SerializeField] private int paddle2Score;
     private bool bIsPlaying = false;
+    [SerializeField] private bool isPaused = false;
 
     private bool bP1isIA;
     private bool bP2isIA;
+
+    public AudioSource audioSource1;
+    public AudioSource audioSource2;
 
     private static GameManager instance;
 
@@ -49,15 +53,22 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        txtEndGame.enabled = false;
+        goEndGame.SetActive(false);
 
         // Show message to start game
         goStartMessage.GetComponent<TextScript>().startBlink();
 
         pcPaddle1 = goPaddle1.GetComponent<PaddleController>();
-        pcPaddle2 = goPaddle1.GetComponent<PaddleController>();
+        pcPaddle2 = goPaddle2.GetComponent<PaddleController>();
         iaPaddle1 = goPaddle1.GetComponent<IAScript>();
-        iaPaddle2 = goPaddle1.GetComponent<IAScript>();
+        iaPaddle2 = goPaddle2.GetComponent<IAScript>();
+
+        bP1isIA = false;
+        bP2isIA = true;
+
+        AudioSource[] audioSources = GetComponents<AudioSource>();
+        audioSource1 = audioSources[0];
+        audioSource2 = audioSources[1];
     }
 
     private void Update()
@@ -67,6 +78,12 @@ public class GameManager : MonoBehaviour
             startGame();
         }
 
+        if (Input.GetKeyDown("p") || Input.GetKeyDown("escape"))
+        {
+            TogglePause();
+            goHelpScreen.SetActive(!goHelpScreen.activeSelf);
+        }
+
         if (Input.GetKeyDown("1"))
         {
             pcPaddle1.enabled = !pcPaddle1.enabled;
@@ -74,12 +91,12 @@ public class GameManager : MonoBehaviour
 
             if (iaPaddle1.enabled)
             {
-                txtIAStateTextP1.text = "PLAYER1 - IA: ENABLED";
+                txtIAStateTextP1.text = "IA";
                 bP1isIA = true;
             }
             else 
             {
-                txtIAStateTextP2.text = "PLAYER1 - IA: DISABLED";
+                txtIAStateTextP1.text = "PLAYER1";
                 bP1isIA = false;
             }
             
@@ -92,57 +109,73 @@ public class GameManager : MonoBehaviour
 
             if (iaPaddle2.enabled)
             {
-                txtIAStateTextP1.GetComponent<TMP_Text>().text = "PLAYER2 - IA: ENABLED";
+                txtIAStateTextP2.GetComponent<TMP_Text>().text = "IA";
                 bP2isIA = true;
             }
             else
             {
-                txtIAStateTextP2.text = "PLAYER2 - IA: DISABLED";
+                txtIAStateTextP2.text = "PLAYER2";
                 bP2isIA = false;
             }
         }
 
-        if (Input.GetKey("escape"))
+        /*if (Input.GetKey("escape"))
         {
             Exit();
-        }
+        }*/
     }
 
     private void startGame() {
+
+        // Reset score
         paddle1Score = 0;
         paddle2Score = 0;
         txtPaddle1Score.text = paddle1Score.ToString();
         txtPaddle2Score.text = paddle2Score.ToString();
+
+        // Reset IA velocity
+        iaPaddle1.resetSpeed();
+        iaPaddle1.resetSpeed();
+
         bIsPlaying = true;
+
+        // Hides all messages
         goStartMessage.GetComponent<TextScript>().stopBlink();
-        txtEndGame.enabled = false;
+        goEndGame.SetActive(false);
+
+        // We launch the ball
         StartCoroutine(relaunch(0));
     }
 
     private void endGame()
     {
+        audioSource2.Play();
+
         bIsPlaying = false;
-        txtEndGame.text = paddle1Score.Equals(iScoreToWin) ? "PLAYER1 WINS!" : "PLAYER2 WINS";
-        txtEndGame.enabled = true;
+        goEndGame.GetComponent<TMP_Text>().text = paddle1Score.Equals(iScoreToWin) ? "PLAYER1 WINS!" : "PLAYER2 WINS";
+        goStartMessage.GetComponent<TextScript>().startBlink();
+        goEndGame.SetActive(true);
     }
 
     public void playerScored(string player) {
+
+        audioSource1.Play();
 
         switch (player) {
             case "1":
                 paddle1Score++;
                 txtPaddle1Score.text = paddle1Score.ToString();
                 if (bP2isIA) 
-                { 
-                
+                {
+                    iaPaddle2.aumSpeed();
                 }
                 break;
             case "2":
                 paddle2Score++;
                 txtPaddle2Score.text = paddle2Score.ToString();
                 if (bP1isIA) 
-                { 
-                
+                {
+                    iaPaddle1.aumSpeed();
                 }
                 break;
         }
@@ -162,6 +195,23 @@ public class GameManager : MonoBehaviour
         goBall.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
         goBall.transform.position = new Vector2(0, 0);
         goBall.GetComponent<BallController>().Launch();
+    }
+
+    // This function toggles the pause state of the game
+    void TogglePause()
+    {
+        isPaused = !isPaused;
+
+        if (isPaused)
+        {
+            Time.timeScale = 0f; // Pauses the game
+            // Here you can also activate your UI for the pause menu
+        }
+        else
+        {
+            Time.timeScale = 1f; // Resumes the game
+            // Here you can deactivate your UI for the pause menu
+        }
     }
 
     void Exit()

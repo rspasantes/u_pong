@@ -1219,7 +1219,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: F1 - HELP
+  m_text: 'P - HELP '
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 1ff27be78caecce4a91f8499363a2cb9, type: 2}
   m_sharedMaterial: {fileID: -1810496784404445831, guid: 1ff27be78caecce4a91f8499363a2cb9, type: 2}
