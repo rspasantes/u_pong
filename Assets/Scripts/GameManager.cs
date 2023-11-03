@@ -78,7 +78,7 @@ public class GameManager : MonoBehaviour
             startGame();
         }
 
-        if (Input.GetKeyDown("p") || Input.GetKeyDown("escape"))
+        if (Input.GetKeyDown("escape"))
         {
             TogglePause();
             goHelpScreen.SetActive(!goHelpScreen.activeSelf);
